@@ -13,9 +13,15 @@ usage_docs() {
 
 validate_args() {
   wait_interval=10 # Waits for 10 seconds
-  if [ "${INPUT_WAITING_INTERVAL}" ]
+  if [ "${INPUT_WAIT_INTERVAL}" ]
   then
-    wait_interval=${INPUT_WAITING_INTERVAL}
+    wait_interval=${INPUT_WAIT_INTERVAL}
+  fi
+
+  api_wait_interval=10 # Waits for 10 seconds
+  if [ "${INPUT_API_WAIT_INTERVAL}" ]
+  then
+    api_wait_interval=${INPUT_API_WAIT_INTERVAL}
   fi
 
   propagate_failure=true
@@ -91,6 +97,8 @@ trigger_workflow() {
 
 wait_for_workflow_to_finish() {
   # Find the id of the last build
+  echo "Sleeping for \"${api_wait_interval}\" seconds"
+  sleep "${api_wait_interval}"
   last_workflow=$(curl -X GET "https://api.github.com/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/runs" \
     -H 'Accept: application/vnd.github.antiope-preview+json' \
     -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}" | jq '[.workflow_runs[]] | first')
